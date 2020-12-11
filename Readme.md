@@ -1,4 +1,6 @@
 
+Run server with admin rights:
+`sudo nodemon app.js`
 
 `ldapsearch -H ldap://localhost:1389 -x -b "o=myhost" objectclass=*`
 
@@ -10,3 +12,6 @@ ldapadd -H ldap://localhost:1389 -x -D cn=root -w secret -f ./user.ldif
 
 #searching new user "ldapjs"
 ldapsearch -H ldap://localhost:1389 -LLL -x -D cn=root -w secret -b "ou=users, o=myhost" cn=ldapjs
+
+#modifyin 
+ldapmodify -H ldap://localhost:1389 -x -D cn=root -w secret -f ./passwd.ldif
