@@ -60,7 +60,7 @@ server.add("ou=users, o=myhost", pre, function (req, res, next) {
   console.log("add");
   if (!req.dn.rdns[0].attrs.cn)
     return next(new ldap.ConstraintViolationError("cn required"));
-
+  console.log('hi')
   if (req.users[req.dn.rdns[0].attrs.cn])
     return next(new ldap.EntryAlreadyExistsError(req.dn.toString()));
 
@@ -151,11 +151,10 @@ server.modify("ou=users, o=myhost", pre, function (req, res, next) {
 });
 
 server.del("ou=users, o=myhost", pre, function (req, res, next) {
+
   if (!req.dn.rdns[0].attrs.cn || !req.users[req.dn.rdns[0].attrs.cn.value])
     return next(new ldap.NoSuchObjectError(req.dn.toString()));
-
-  var userdel = spawn("userdel", ["-f", req.dn.rdns[0].attrs.cn]);
-
+  var userdel = spawn("userdel", ["-f", req.dn.rdns[0].attrs.cn.value]);
   var messages = [];
   userdel.stdout.on("data", function (data) {
     messages.push(data.toString());
@@ -163,13 +162,13 @@ server.del("ou=users, o=myhost", pre, function (req, res, next) {
   userdel.stderr.on("data", function (data) {
     messages.push(data.toString());
   });
-
   userdel.on("exit", function (code) {
     if (code !== 0) {
       var msg = "" + code;
       if (messages.length) msg += ": " + messages.join();
       return next(new ldap.OperationsError(msg));
     }
+
 
     res.end();
     return next();
