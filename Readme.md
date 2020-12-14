@@ -1,9 +1,9 @@
 
-LDAP Server
+# LDAP Server
 
 ```shell
 #Run server with admin rights:
-sudo nodemon app.js
+sudo nodemon app-server.js
 
 #search users
 ldapsearch -H ldap://localhost:1389 -x -b "o=myhost" objectclass=*
@@ -24,11 +24,16 @@ ldapmodify -H ldap://localhost:1389 -x -D cn=root -w secret -f ./passwd.ldif
 ldapdelete -H ldap://localhost:1389 -x -D cn=root -w secret "cn=ldapjs, ou=users, o=myhost"
 ```
 
-LDAP Client
+# LDAP Client
 
-Run server in docker:
-`docker run -p 389:389 -p 636:636 --name my-openldap-container -d docker-remote.artifactory.ham.hella.com/osixia/openldap:1.4.0
-`
+```shell
+#Run server in docker:
+docker run -p 389:389 -p 636:636 --name my-openldap-container -d docker-remote.artifactory.ham.hella.com/osixia/openldap:1.4.0
 
 #Shows all entries in docker:
 docker exec my-openldap-container ldapsearch -x -H ldap://localhost:389 -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w admin
+
+#Run client:
+nodemon app-client.js
+
+```
