@@ -5,17 +5,19 @@ var client = ldap.createClient({
   url: "ldap://localhost:389",
 });
 
-client.bind("cn=admin,dc=example,dc=org", "admin", function (err) {
+client.bind("cn=admin,dc=example,dc=org", "adminPassword", function (err, res) {
   assert.ifError(err);
+  // console.log('res', res);
   let newUser = {
-    cn: "userId5",
+    cn: "userId7",
+
     userPassword: "password",
     objectClass: "person",
     sn: "efub",
   };
-
+  // Here i successfully add this user "userId7"
   // client.add(
-  //   "cn=userId5,dc=example,dc=org",
+  //   "cn=userId7,dc=example,dc=org",
   //   newUser,
   //   (err, response) => {
   //     if (err) return console.log(err);
@@ -24,22 +26,19 @@ client.bind("cn=admin,dc=example,dc=org", "admin", function (err) {
   // );
 
   var options = {
-    filter: "(objectClass=*)",
+    filter: "objectClass=*",
     scope: "sub",
+    attributes: ['cn']
   };
-
-  //   console.log("connected");
+  // Now the search, it runs without error, but does never receive a searchEntry
   client.search(
-    "cn=admin,dc=example,dc=org",
+    "cn=userId7,dc=example,dc=org",
     options,
     function (error, search) {
       console.log("Searching.....");
 
       client.on("searchEntry", function (entry) {
-        console.log("hi searchEntry");
-        //   if (entry.object) {
-        //     console.log("entry: %j " + JSON.stringify(entry.object));
-        //   }
+        console.log("I found a result in searchEntry");
       });
 
       client.on("error", function (error) {
