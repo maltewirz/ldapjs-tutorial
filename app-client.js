@@ -7,7 +7,6 @@ var client = ldap.createClient({
 
 client.bind("cn=admin,dc=example,dc=org", "adminPassword", function (err, res) {
   assert.ifError(err);
-  // console.log('res', res);
   let newUser = {
     cn: "userId7",
 
@@ -16,32 +15,32 @@ client.bind("cn=admin,dc=example,dc=org", "adminPassword", function (err, res) {
     sn: "efub",
   };
   // Here i successfully add this user "userId7"
-  // client.add(
-  //   "cn=userId7,dc=example,dc=org",
-  //   newUser,
-  //   (err, response) => {
-  //     if (err) return console.log(err);
-  //     return response;
-  //   }
-  // );
+  client.add(
+    "cn=userId7,dc=example,dc=org",
+    newUser,
+    (err, response) => {
+      if (err) return console.log(err);
+      return response;
+    }
+  );
 
   var options = {
-    filter: "objectClass=*",
+    filter: "(objectclass=*)",
     scope: "sub",
     attributes: ['cn']
   };
-  // Now the search, it runs without error, but does never receive a searchEntry
+  // Now the search for userId7
   client.search(
     "cn=userId7,dc=example,dc=org",
     options,
-    function (error, search) {
+    function (error, res) {
       console.log("Searching.....");
 
-      client.on("searchEntry", function (entry) {
-        console.log("I found a result in searchEntry");
+      res.on("searchEntry", function (entry) {
+        console.log("I found a result in searchEntry", JSON.stringify(entry.object));
       });
 
-      client.on("error", function (error) {
+      res.on("error", function (error) {
         console.error("error: " + error.message);
       });
 
@@ -49,7 +48,7 @@ client.bind("cn=admin,dc=example,dc=org", "adminPassword", function (err, res) {
         if (error) {
           console.log(error.message);
         } else {
-          // console.log("client disconnected");
+          console.log("client disconnected");
         }
       });
     }
