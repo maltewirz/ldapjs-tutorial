@@ -46,8 +46,14 @@ usage: ldapsearch [options] [filter [attributes...]]
 -b basedn  base dn for search
 
 #Shows all entries in docker:
-docker exec ldap-service ldapsearch -LLL -x -D "cn=admin,dc=example,dc=org" -w "adminPassword" -b "cn=admin,dc=example,dc=org" "(objectclass=*)"
+docker exec ldap-service ldapsearch -LLL -x -D "cn=admin,dc=example,dc=org" -w "adminPassword" -b "dc=example,dc=org" "(objectclass=*)"
 
 #Show specific entry in docker for userId7
 docker exec ldap-service ldapsearch -LLL -x -D "cn=admin,dc=example,dc=org" -w "adminPassword" -b "cn=userId7,dc=example,dc=org" "(objectclass=*)"
+
+# Adding group
+
+sudo docker cp add_user_no_password.ldif ldap-service:/
+
+docker exec -it ldap-service ldapadd -x -W -D "cn=admin,dc=example,dc=org"  -f add_user_no_password.ldif 
 ```
