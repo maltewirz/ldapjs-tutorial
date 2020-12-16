@@ -31,13 +31,17 @@ ldapdelete -H ldap://localhost:1389 -x -D cn=root -w secret "cn=ldapjs, ou=users
 nodemon app-client.js
 
 #Run server in docker:
-docker run -p 389:389 --name ldap-service --hostname ldap-service --env LDAP_ORGANISATION="Example Inc." --env LDAP_DOMAIN="example.org" \
---env LDAP_ADMIN_PASSWORD="adminPassword" --env LDAP_BASE_DN="dc=example,dc=org"  --detach  docker-remote.artifactory.ham.hella.com/osixia/openldap:1.3.0
+docker run -p 389:389 --name ldap-service --hostname ldap-service \
+--env LDAP_ADMIN_PASSWORD="password" --env LDAP_BASE_DN="dc=example,dc=org"  --detach  docker-remote.artifactory.ham.hella.com/osixia/openldap:1.3.0
 
 #Run Frontend in docker:
 docker run --name phpldapadmin-service -p 6443:443 --hostname phpldapadmin-service --link ldap-service:ldap-host --env PHPLDAPADMIN_LDAP_HOSTS=ldap-service --detach docker-remote.artifactory.ham.hella.com/osixia/phpldapadmin:0.9.0
 
-#ldapsearch Flags:
+# Adding user "developer" and group "Maintainers" of which the former is a member
+sudo docker cp complete-setup.ldif ldap-service:/
+docker exec -it ldap-service ldapadd -x -W -D "cn=admin,dc=example,dc=org"  -f complete-setup.ldif 
+
+# Info: ldapsearch Flags:
 usage: ldapsearch [options] [filter [attributes...]]
 -LLL Trim down output
 -x Simple authentication
@@ -46,14 +50,9 @@ usage: ldapsearch [options] [filter [attributes...]]
 -b basedn  base dn for search
 
 #Shows all entries in docker:
-docker exec ldap-service ldapsearch -LLL -x -D "cn=admin,dc=example,dc=org" -w "adminPassword" -b "dc=example,dc=org" "(objectclass=*)"
+docker exec ldap-service ldapsearch -LLL -x -D "cn=admin,dc=example,dc=org" -w "password" -b "dc=example,dc=org" "(objectclass=*)"
 
 #Show specific entry in docker for userId7
-docker exec ldap-service ldapsearch -LLL -x -D "cn=admin,dc=example,dc=org" -w "adminPassword" -b "cn=userId7,dc=example,dc=org" "(objectclass=*)"
+docker exec ldap-service ldapsearch -LLL -x -D "cn=admin,dc=example,dc=org" -w "password" -b "cn=developer,dc=example,dc=org" "(objectclass=*)"
 
-# Adding group
-
-sudo docker cp add_user_no_password.ldif ldap-service:/
-
-docker exec -it ldap-service ldapadd -x -W -D "cn=admin,dc=example,dc=org"  -f add_user_no_password.ldif 
 ```

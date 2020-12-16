@@ -5,39 +5,20 @@ var client = ldap.createClient({
   url: "ldap://localhost:389",
 });
 
-client.bind("cn=admin,dc=example,dc=org", "adminPassword", function (err, res) {
+client.bind("cn=admin,dc=example,dc=org", "password", function (err, res) {
   assert.ifError(err);
-  let newUser = {
-    cn: "userId7",
-
-    userPassword: "password",
-    objectClass: "person",
-    sn: "efub",
-  };
-  // Here i successfully add this user "userId7"
-  client.add(
-    "cn=userId7,dc=example,dc=org",
-    newUser,
-    (err, response) => {
-      if (err) return console.log(err);
-      return response;
-    }
-  );
 
   var options = {
     filter: "(objectclass=*)",
     scope: "sub",
     attributes: ['cn']
   };
-  // Now the search for userId7
   client.search(
-    "cn=userId7,dc=example,dc=org",
+    "dc=example,dc=org",
     options,
     function (error, res) {
-      console.log("Searching.....");
-
       res.on("searchEntry", function (entry) {
-        console.log("I found a result in searchEntry", JSON.stringify(entry.object));
+        console.log("Searchentry:", JSON.stringify(entry.object));
       });
 
       res.on("error", function (error) {
